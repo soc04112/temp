@@ -1,0 +1,158 @@
+.chat{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-align: center;
+}
+
+.chat-container {
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--text-color);
+    background-color: var(--bg-color);
+    display: grid;
+    grid-template-columns: 1fr 5fr;
+}
+
+.chat-navi {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #666;
+}
+
+.chat-navi button {
+    height: 60px;
+    color:inherit;
+    font-weight: bold;
+    border: none;
+    border-bottom: 1px solid black;
+    cursor: pointer;
+}
+
+.respone-container {
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+}
+
+.text-container {
+    flex-grow: 1;           /* 남는 공간 차지 */
+    max-height: 100%;
+    overflow-y: auto;       /* 넘치면 스크롤 */
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.text-container::-webkit-scrollbar {
+  width: 8px;     
+  display: block;
+}
+
+.text-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.3); /* 스크롤바 색 */
+  border-radius: 4px;                 /* 모서리 둥글게 */
+}
+
+.text-container::-webkit-scrollbar-track {
+  background-color: rgba(0,0,0,0.05); /* 트랙 색 */
+  border-radius: 4px;
+}
+
+.input-area {
+    flex-shrink: 0;        /* 입력창 높이 고정 */
+    display: flex;
+    justify-content: center;
+    padding: 5px 0;
+}
+
+.message {
+  padding: 8px 12px;
+  border-radius: 12px;
+  max-width: 70%;
+  word-break: break-word;
+}
+
+.user-msg {
+  background-color: #ffe680;
+  align-self: flex-end;
+}
+
+.bot-msg {
+  background-color: #fff;
+  align-self: flex-start;
+  border: 1px solid #ddd;
+}
+
+.msg-search {
+  width: 60%;               /* 가로 꽉 채우기 */
+  min-height: 80px;          /* 최소 높이 */
+  padding: 10px 15px;        /* 안쪽 여백 */
+  font-size: 1em;
+  font-family: 'Arial', sans-serif;
+  border: 2px solid #ccc;    /* 기본 테두리 */
+  border-radius: 8px;        /* 둥근 모서리 */
+  outline: none;             /* 기본 파란 테두리 제거 */
+  resize: none;              /* 크기 조절 막기 */
+  background-color: #fefefe; /* 배경 색 */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* 살짝 그림자 */
+  transition: 0.2s all ease-in-out;
+  z-index: 999;
+}
+
+/* 포커스 시 강조 */
+.msg-search:focus {
+  border-color: #ffcc00;     /* 노란색 테두리 */
+  box-shadow: 0 0 8px rgba(255, 204, 0, 0.4); /* 살짝 빛나는 효과 */
+  background-color: #fffbee;
+}
+
+/* 스크롤바 스타일 (선택) */
+.msg-search::-webkit-scrollbar {
+  width: 6px;
+}
+
+.msg-search::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 3px;
+}
+
+.msg-export-button {
+    width: 100px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5em;
+    color: #555;
+    padding: 5px;
+}
+
+.msg-export-button:hover {
+    color: #000;
+}
+
+
+@media screen and (max-width: 768px) {
+  .msg-search {
+    width: 60%;               /* 가로 꽉 채우기 */
+    padding: 10px 15px;        /* 안쪽 여백 */
+    font-size: 0.8em;
+    font-family: 'Arial', sans-serif;
+    border: 2px solid #ccc;    /* 기본 테두리 */
+    border-radius: 8px;        /* 둥근 모서리 */
+    outline: none;             /* 기본 파란 테두리 제거 */
+    resize: none;              /* 크기 조절 막기 */
+    background-color: #fefefe; /* 배경 색 */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* 살짝 그림자 */
+    transition: 0.2s all ease-in-out;
+    z-index: 999;
+}
+
+  .msg-export-button {
+      width: 30px;
+  }
+}

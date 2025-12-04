@@ -1,0 +1,93 @@
+/* header */
+/* 폰트는 최상단 html에서 관리 */
+
+.custom-header {
+    width: 100%;
+    height: auto;
+    display: grid;
+    align-items: stretch;
+    justify-content: center;
+    grid-template-columns: 1fr 3fr 1fr;
+    margin-top: 10px;
+}
+
+.custom-header * {
+    color : inherit;
+    background-color: inherit;
+}
+
+.header-login-sign {
+    border: 1px solid black;
+}
+
+.header-login-sign button {
+    
+}
+
+.header-title {
+    font-size: 0.8em;
+}
+
+.header-ticker-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 30px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* alert */
+.total, .only {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    font-weight: bold;
+    width: auto;
+}
+
+    .total a, .only a {
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 0.8em;
+    }
+
+    .total label, .only label {
+        font-size: 0.7em;
+    }
+
+.TICKER {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+img {
+    width: 13px;
+    height: 13px;
+    margin-right: 5px;
+}
+
+@media screen and (max-width: 768px) {
+    .custom-header {
+        width: 100%;    
+        margin-top: 15px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap:10px;
+    }
+
+    .header-title h2 {
+        font-size: 1.3em;
+        margin: 5px;
+    }
+
+    .only {
+        display: none;
+    }
+}
