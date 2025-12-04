@@ -6,7 +6,7 @@ import "../styles/pages/home.css"
 
 export default function Home() {
     const navigate = useNavigate();
-
+    
     return (
         <div className="frame">
             <Header/>

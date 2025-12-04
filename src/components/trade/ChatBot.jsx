@@ -29,48 +29,38 @@ export default function ChatBot() {
 
   return (
     <div className="chat">
-    <h2>Chat Assistant</h2>
-      <div className="chat-container">
-        <div className="chat-navi">
-          <button>Chat</button>
-          <button>History</button>
+      <h2>Chat Assistant</h2>
+      <div className="respone-container">
+        <div className="text-container" ref={textContainerRef}>
+          {messages.map(m => (
+            <div
+              key={m.id}
+              className={`message ${m.role === 'user' ? 'user-msg' : 'bot-msg'}`}
+            >
+              {m.text}
+            </div>
+          ))}
         </div>
 
-        <div className="respone-container">
-          <div className="text-container" ref={textContainerRef}>
-            {messages.map(m => (
-              <div
-                key={m.id}
-                className={`message ${m.role === 'user' ? 'user-msg' : 'bot-msg'}`}
-              >
-                {m.text}
-              </div>
-            ))}
-          </div>
-
-          <form
-            className="input-area"
-            onSubmit={e => {
-              e.preventDefault();
-              handleSend();
+        <form
+          className="input-area"
+          onSubmit={e => {
+            e.preventDefault();
+            handleSend();
+          }}
+        >
+          <textarea
+            className="msg-search"
+            value={msg}
+            onChange={e => setMsg(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
             }}
-          >
-            <textarea
-              className="msg-search"
-              value={msg}
-              onChange={e => setMsg(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-            />
-            <button type="submit" className="msg-export-button">
-              <i className="fa-solid fa-magnifying-glass"></i>
-            </button>
-          </form>
-        </div>
+          />
+        </form>
       </div>
     </div>
   );

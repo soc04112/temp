@@ -48,7 +48,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Navigate to="/home" replace />} />
                     <Route path="/home" element={<Home />} />
-                    <Route path="/trade" element={<Trade />} />
+                    <Route path="/trade" element={<Trade darkMode={darkMode}/>} />
                     <Route path="/dashboard" element={<Dashboard />} />
                 </Routes>
             </BrowserRouter>
