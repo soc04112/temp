@@ -1,6 +1,6 @@
 ﻿// src/pages/trade.jsx
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import "../styles/pages/trade.css";
 
 import Header from "../components/common/Header.jsx";
@@ -9,21 +9,30 @@ import TopStats from "../components/trade/TopStats.jsx";
 import ChatBot from "../components/trade/ChatBot.jsx";
 import TradingViewWidget from "../components/trade/TradingViewWidget.jsx";
 
-export default function TradePage() {
+export default function TradePage({ darkMode, setDarkMode }) {
+    const [isLogin, setIsLogin] = useState(false);
+
+    // 컴포넌트 마운트 시 로그인 상태 확인
+    useEffect(() => {
+        const loginState = localStorage.getItem("isLogin") === "true";
+        setIsLogin(loginState);
+    }, []);
+
     return (
         <div className="trade-container">
             <div className="area-header">
-                <Header />
+                <Header darkMode={darkMode} setDarkMode={setDarkMode} isLogin={isLogin} />
             </div>
 
             <div className="area-top-stats">
-                <TopStats />
+                <TopStats isLogin={isLogin} />
             </div>
 
             <div className="area-main">
+                
                 {/* 1. 왼쪽: 트레이딩 뷰 (차트) */}
                 <div className="chart-box">
-                    <TradingViewWidget /> 
+                    <TradingViewWidget darkMode={darkMode} />
                 </div>
 
                 {/* 2. 중앙: 관심종목 리스트 (Watchlist) */}

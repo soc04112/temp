@@ -1,10 +1,22 @@
 ﻿// src/components/common/Header.jsx
 
 import "../../styles/common/Header.css";
-// 마리오 이미지 (public/assets 폴더에 이미지가 있다고 가정하거나, 없으면 텍스트만 나옵니다)
-// import MarioIcon from '../../assets/mario_icon.png'; 
+import { useState } from 'react';
+import LoginModel from './Login.jsx'; // 로그인 모달 (기존에 있다면 사용)
+import LogOut from '../../services/POST/LogOut.jsx';
 
-export default function Header() {
+export default function Header({ darkMode, setDarkMode, isLogin }) {
+    const [showLoginModal, setShowLoginModal] = useState(false);
+
+    // 로그아웃 핸들러
+    const handleLogout = async () => {
+        if(window.confirm("로그아웃 하시겠습니까?")) {
+            await LogOut();
+            localStorage.removeItem("isLogin");
+            window.location.reload();
+        }
+    };
+
     return (
         <div className="custom-header-content">
             {/* 좌측: 투자 마리오 로고 */}
@@ -21,11 +33,54 @@ export default function Header() {
 
             {/* 우측: 유틸리티 버튼 */}
             <div className="header-utils">
-                <button className="icon-btn">☀</button> {/* 다크모드 토글 */}
-                <button className="login-btn">
-                    <i className="fa-solid fa-right-to-bracket"></i> 로그인
+                {/* 로그인 상태일 때 보여줄 정보들 */}
+                {isLogin && (
+                    <div className="user-info-bar">
+                        <div className="info-item">
+                            <span className="label">자금:</span>
+                            <span className="value">₩ 15,000,000</span>
+                        </div>
+                        <div className="info-item">
+                            <span className="label">등급:</span>
+                            <span className="value badge-gold">Gold</span>
+                        </div>
+                        <div className="info-item">
+                            <span className="label">성향:</span>
+                            <span className="value text-red">공격형</span>
+                        </div>
+                        
+                        <div className="divider"></div>
+
+                        <span className="user-name"><strong>홍길동</strong>님</span>
+                        
+                        <button className="icon-btn-small" title="내 정보 상세">
+                            <i className="fa-solid fa-user-gear"></i>
+                        </button>
+                    </div>
+                )}
+
+                <button 
+                    className="icon-btn" 
+                    onClick={() => setDarkMode(prev => !prev)}
+                    title="다크모드 토글"
+                >
+                    {darkMode ? '☀️' : '🌙'}
                 </button>
+
+                {/* 로그인/로그아웃 버튼 */}
+                {isLogin ? (
+                    <button className="logout-btn" onClick={handleLogout}>
+                        로그아웃
+                    </button>
+                ) : (
+                    <button className="login-btn" onClick={() => setShowLoginModal(true)}>
+                        <i className="fa-solid fa-right-to-bracket"></i> 로그인
+                    </button>
+                )}
             </div>
+
+            {/* 로그인 모달 */}
+            {showLoginModal && <LoginModel onClose={() => setShowLoginModal(false)} />}
         </div>
     )
 }

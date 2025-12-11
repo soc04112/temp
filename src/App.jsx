@@ -38,16 +38,13 @@ function App() {
 
     return (
         <>
-            <button 
-                className="dark-toggle-btn"
-                onClick={() => setDarkMode(prev => !prev)}
-            >
-                <Settings size={20} />
-            </button>
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<Navigate to="/trade" replace />} />
-                    <Route path="/trade" element={<Trade darkMode={darkMode}/>} />
+                    <Route 
+                        path="/trade" 
+                        element={<Trade darkMode={darkMode} setDarkMode={setDarkMode} />} 
+                    />
                     <Route path="/dashboard" element={<Dashboard />} />
                 </Routes>
             </BrowserRouter>

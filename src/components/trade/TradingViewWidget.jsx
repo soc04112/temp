@@ -1,12 +1,11 @@
-// src/components/trade/TradingViewWidget.jsx
 import React, { useEffect, useRef, memo } from 'react';
 
-function TradingViewWidget() {
+function TradingViewWidget({ darkMode }) {
   const container = useRef();
+  const theme = darkMode ? "dark" : "light";
 
   useEffect(() => {
-    // 위젯이 중복 생성되는 것을 방지
-    if (container.current.querySelector("script")) return;
+    container.current.innerHTML = ""; 
 
     const script = document.createElement("script");
     script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
@@ -18,7 +17,7 @@ function TradingViewWidget() {
         "symbol": "BINANCE:BTCUSDT",
         "interval": "D",
         "timezone": "Asia/Seoul",
-        "theme": "dark",
+        "theme": "${theme}", 
         "style": "1",
         "locale": "kr",
         "enable_publishing": false,
@@ -31,7 +30,7 @@ function TradingViewWidget() {
         "support_host": "https://www.tradingview.com"
       }`;
     container.current.appendChild(script);
-  }, []);
+  }, [theme]);
 
   return (
     <div className="tradingview-widget-container" ref={container} style={{ height: "100%", width: "100%" }}>

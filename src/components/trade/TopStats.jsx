@@ -11,6 +11,14 @@ export default function TopStats() {
         { label: "24시간 청산", short: "106.65M", long: "94.41M", total: "201.06M" },
     ];
 
+    // 최근 거래 내역 더미 데이터
+    const recentTrades = [
+        { time: "14:02:33", coin: "BTC", market: "USDT", type: "매수", qty: "0.005", isBuy: true },
+        { time: "13:45:10", coin: "ETH", market: "USDT", type: "매도", qty: "1.200", isBuy: false },
+        { time: "11:20:05", coin: "XRP", market: "KRW", type: "매수", qty: "500.0", isBuy: true },
+        { time: "09:15:00", coin: "SOL", market: "USDT", type: "매수", qty: "10.00", isBuy: true },
+    ];
+
     const styles = {
         container: {
             width: '100%',
@@ -25,7 +33,8 @@ export default function TopStats() {
             gap: '10px',
         },
         card: {
-            backgroundColor: '#1e222d',
+            backgroundColor: 'var(--trade-card-bg)',
+            border: '1px solid var(--trade-border)',
             borderRadius: '4px',
             padding: '10px',
             display: 'flex',
@@ -36,7 +45,7 @@ export default function TopStats() {
         },
         title: {
             fontSize: '1.1rem',
-            color: '#d1d4dc',
+            color: 'var(--trade-text)',
             marginBottom: '5px',
             fontWeight: 'bold',
             display: 'flex',
@@ -48,7 +57,7 @@ export default function TopStats() {
             display: 'flex',
             justifyContent: 'space-between',
             marginBottom: '10px',
-            backgroundColor: '#1B3146',
+            backgroundColor: 'var(--trade-bg)',
             padding: '2px 5px',
             borderRadius: '2px',
             alignItems: 'center',
@@ -58,7 +67,7 @@ export default function TopStats() {
             display: 'flex',
             justifyContent: 'space-between',
             marginBottom: '10px',
-            backgroundColor: '#30263F',
+            backgroundColor: 'var(--trade-bg)',
             padding: '2px 5px',
             borderRadius: '2px',
             alignItems: 'center',
@@ -68,23 +77,46 @@ export default function TopStats() {
             display: 'flex',
             justifyContent: 'center',
             marginBottom: '2px',
+            color: 'var(--trade-subtext)',
         },
 
         shortText: { color: '#D64D57' }, // 빨강
         longText: { color: '#38B66C' },  // 초록
-        totalText: { fontSize: '1.1rem', fontWeight: 'bold' },  // 초록
+        totalText: { fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--trade-text)' },  // 초록
         
         bannerArea: {
             flex: 1,
-            backgroundColor: '#2a2e39', // 약간 더 밝은 배경
+            backgroundColor: 'var(--trade-card-bg)',
+            border: '1px solid var(--trade-border)',
             borderRadius: '4px',
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
             flexDirection: 'column',
-            color: '#fff',
+            color: 'var(--trade-text)',
+            overflow: 'hidden', // 테이블 스크롤 처리
+            padding: isLogin ? '0' : '10px', // 로그인 시 패딩 제거
+            justifyContent: isLogin ? 'start' : 'center',
+            alignItems: isLogin ? 'stretch' : 'center',
+        },
+        // 거래 내역 테이블 스타일
+        tableHeader: {
+            display: 'grid',
+            gridTemplateColumns: '1.2fr 0.8fr 0.8fr 0.8fr 1fr',
+            padding: '8px 10px',
+            fontSize: '0.75rem',
+            fontWeight: 'bold',
+            backgroundColor: 'var(--trade-bg)',
+            borderBottom: '1px solid var(--trade-border)',
+            color: 'var(--trade-subtext)',
             textAlign: 'center',
-            padding: '10px',
+        },
+        tableRow: {
+            display: 'grid',
+            gridTemplateColumns: '1.2fr 0.8fr 0.8fr 0.8fr 1fr',
+            padding: '6px 10px',
+            fontSize: '0.8rem',
+            borderBottom: '1px solid var(--trade-border)',
+            textAlign: 'center',
+            alignItems: 'center',
         }
     };
 
@@ -95,15 +127,15 @@ export default function TopStats() {
                     <div key={idx} style={styles.card}>
                         <div style={styles.title}>⚡ {stat.label}</div>
                         <div style={styles.row_long}>
-                            <span style={{color:'#aaa'}}>롱 청산</span>
+                            <span style={{color:'var(--trade-subtext)'}}>롱 청산</span>
                             <span style={styles.longText}>${stat.long}</span>
                         </div>
                         <div style={styles.row_short}>
-                            <span style={{color:'#aaa'}}>숏 청산</span>
+                            <span style={{color:'var(--trade-subtext)'}}>숏 청산</span>
                             <span style={styles.shortText}>${stat.short}</span>
                         </div>
                         <div style={styles.row_total}>
-                            <span style={{color:'#aaa'}}>총 청산</span>
+                            <span style={{color:'var(--trade-subtext)'}}>총 청산</span>
                         </div>
                         <div style={styles.row_total}>
                             <span style={styles.totalText}>${stat.total}</span>
@@ -113,8 +145,36 @@ export default function TopStats() {
             </div>
             
             <div style={styles.bannerArea}>
-                <h3 style={{margin:'0 0 5px 0', fontSize:'1rem'}}>로그인 후 사용하실 수 있습니다</h3>
-                <p style={{margin:0, fontSize:'0.8rem', color:'#aaa'}}>개인정보 (ex 투자성향, 즐겨찾기, 자금 등)</p>
+                {isLogin ? (
+                    <>
+                        <div style={{padding:'8px 10px', fontSize:'0.9rem', fontWeight:'bold', borderBottom:'1px solid var(--trade-border)'}}>
+                            📋 최근 거래 내역
+                        </div>
+                        <div style={styles.tableHeader}>
+                            <span>체결시간</span>
+                            <span>코인명</span>
+                            <span>마켓</span>
+                            <span>종류</span>
+                            <span>거래수량</span>
+                        </div>
+                        <div style={{overflowY:'auto', flex:1}}>
+                            {recentTrades.map((trade, i) => (
+                                <div key={i} style={styles.tableRow}>
+                                    <span style={{color:'var(--trade-subtext)'}}>{trade.time}</span>
+                                    <span style={{fontWeight:'bold'}}>{trade.coin}</span>
+                                    <span>{trade.market}</span>
+                                    <span style={{color: trade.isBuy ? '#089981' : '#f23645'}}>{trade.type}</span>
+                                    <span>{trade.qty}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <h3 style={{margin:'0 0 5px 0', fontSize:'1rem'}}>로그인 후 사용하실 수 있습니다</h3>
+                        <p style={{margin:0, fontSize:'0.8rem', color:'var(--trade-subtext)'}}>개인정보 (ex 투자성향, 즐겨찾기, 자금 등)</p>
+                    </>
+                )}
             </div>
         </div>
     );

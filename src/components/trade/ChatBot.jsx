@@ -29,7 +29,6 @@ export default function ChatBot() {
 
   return (
     <div className="chat">
-      <h2>Chat Assistant</h2>
       <div className="respone-container">
         <div className="text-container" ref={textContainerRef}>
           {messages.map(m => (
