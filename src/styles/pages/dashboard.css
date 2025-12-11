@@ -1,67 +1,154 @@
-﻿.dash-main {
-    width: 100%;
-    height: 100%;
+﻿/* src/styles/pages/trade.css */
+
+/* 1. 색상 변수 정의 (라이트 모드 기본) */
+:root {
+    --trade-bg: #f5f5f5;           /* 전체 배경 (밝은 회색) */
+    --trade-card-bg: #ffffff;      /* 카드 배경 (흰색) */
+    --trade-text: #333333;         /* 기본 텍스트 (검정) */
+    --trade-border: #e0e0e0;       /* 테두리 (연한 회색) */
+    --trade-subtext: #666666;      /* 보조 텍스트 */
+    --trade-hover: #f0f0f0;        /* 호버 색상 */
+}
+
+/* 2. 다크 모드일 때 색상 재정의 */
+body.dark-mode {
+    --trade-bg: #131722;           /* 딥 다크 네이비 */
+    --trade-card-bg: #1e222d;      /* 카드 배경 */
+    --trade-text: #d1d4dc;         /* 기본 텍스트 */
+    --trade-border: #2a2e39;       /* 테두리 */
+    --trade-subtext: #888888;      /* 보조 텍스트 */
+    --trade-hover: #2a2e39;        /* 호버 색상 */
+}
+
+/* 1. 전체 레이아웃 (높이 조절을 위해 rows 수정 가능) */
+.trade-container {
     display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 5px;
-    padding: 15px;
-    overflow-y: auto;
-    overflow-x: hidden; /* 이상한 선 제거*/
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--trade-bg); /* 변수 적용 */
+    color: var(--trade-text);          /* 변수 적용 */
+    
+    /* 기존: 60px 80px 1fr 30px */
+    /* 변경: 상단 배너(top-stats) 높이를 살짝 줄이고(80->70), 
+       푸터(footer) 높이를 늘리거나(30->40) 하여 메인 영역 비율을 조절할 수도 있습니다. */
+    grid-template-rows: 60px 200px 1fr auto; 
+
+    grid-template-areas: 
+        "header"
+        "top-stats"
+        "main-content"
+        "footer";
+    overflow: hidden;
 }
-    .dash-main::-webkit-scrollbar {
-        display: none;
-    }
 
+/* .area-header { grid-area: header; border-bottom: 1px solid #2a2e39; }
+.area-top-stats { grid-area: top-stats; padding: 5px 10px; }
+.area-footer { grid-area: footer; background: #131722; border-top: 1px solid #2a2e39; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #777; padding: 3px 0; white-space: normal; text-align: center;} */
+.area-header { 
+    grid-area: header; 
+    border-bottom: 1px solid var(--trade-border); 
+    background-color: var(--trade-bg);
+}
+.area-top-stats { 
+    grid-area: top-stats; 
+    padding: 5px 10px; 
+    background-color: var(--trade-bg);
+}
+.area-footer { 
+    grid-area: footer; 
+    background: var(--trade-bg); 
+    border-top: 1px solid var(--trade-border); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 0.7rem; 
+    color: var(--trade-subtext);
+    padding: 10px 0;
+    white-space: normal;
+    text-align: center;
+}
 
-.dash-main-left {
-    display: flex;
+/* ------------------------------------------------ */
+/* ★ 메인 콘텐츠 (3단 분할: 차트 - 리스트 - 채팅) */
+/* ------------------------------------------------ */
+.area-main {
+    grid-area: main-content;
+    display: grid;
+    grid-template-columns: 1fr 260px 400px;  
+    gap: 10px;
+    padding: 10px;
+    overflow: hidden;
+}
+
+.chart-box, .watchlist-box, .chat-box {
+    background-color: var(--trade-card-bg);
+    border: 1px solid var(--trade-border);
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;       
     flex-direction: column;
-    align-items: center;
-    gap:20px;
-    border-radius: 10px;
-    background: rgba(237, 245, 250, 0.3);
-    box-shadow: 0 4px 12px rgba(0.3, 0, 0, 0.3);
-    backdrop-filter: blur(4px);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    padding: 15px;
+}
+
+.list-header {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    padding: 10px;
+    font-size: 0.75rem;
+    color: var(--trade-subtext);
+    border-bottom: 1px solid var(--trade-border);
+    font-weight: bold;
+    background-color: var(--trade-card-bg);
+}
+
+.list-content {
     overflow-y: auto;
+    flex: 1;
 }
 
-    .dash-main-left::-webkit-scrollbar {
-        display: none;
-    }
-
-.menu {
-  width: 100%;
-  height: 50px;
-  border: none;
-  border-radius: 10px;
-  background-color: rgba(255, 255, 255, 0.2); 
-  backdrop-filter: blur(6px);               
-  -webkit-backdrop-filter: blur(6px);     
-  box-shadow: 0 4px 12px rgba(0.2, 0, 0, 0.2);
-  cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
-
-  font-size: 15px;
-  color: inherit;
-  font-weight: bold;
-}
-
-    .menu:hover {
-    background-color: rgba(0,0,0,0.05);
-    }
-
-.dash-main-center {
-    display: flex;
-    flex-direction: column;
+.list-row {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    padding: 8px 10px;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--trade-border);
     align-items: center;
-    border-radius: 10px;
-    background: rgba(237, 245, 250, 0.3);
-    box-shadow: 0 4px 12px rgba(0.2, 0, 0, 0.3);
-    backdrop-filter: blur(4px);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    box-sizing: border-box;
-    padding: 15px;
-    overflow-x: auto;
+    cursor: pointer;
+    transition: background 0.2s;
+    color: var(--trade-text);
+}
+.list-row:hover { background-color: var(--trade-hover); }
+
+.panel-title {
+    padding: 10px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border-bottom: 1px solid var(--trade-border);
+    background-color: var(--trade-card-bg);
+    color: var(--trade-text);
+}
+
+.chat-content-area {
+    flex: 1;
+    overflow: hidden; 
+    position: relative;
+}
+
+/* 스크롤바 (다크모드일 때만 어둡게, 라이트모드는 기본) */
+body.dark-mode ::-webkit-scrollbar-track { background: #131722; }
+body.dark-mode ::-webkit-scrollbar-thumb { background: #444; }
+
+/* 공통 유틸리티 */
+.text-up { color: #089981; }
+.text-down { color: #f23645; }
+.badge { padding: 2px 4px; border-radius: 2px; text-align: right; }
+.bg-up { background-color: rgba(8, 153, 129, 0.2); color: #089981; }
+.bg-down { background-color: rgba(242, 54, 69, 0.2); color: #f23645; }
+
+/* 모바일 반응형 (세로 배치) */
+@media (max-width: 1024px) {
+    .area-main {
+        grid-template-columns: 1fr; /* 1열로 변경 */
+        grid-template-rows: 450px 300px 400px; /* 차트 - 리스트 - 채팅 순서 */
+        overflow-y: auto;
+    }
 }

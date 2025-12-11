@@ -91,32 +91,9 @@ export default function TopStats() {
             borderRadius: '4px',
             display: 'flex',
             flexDirection: 'column',
-            color: 'var(--trade-text)',
-            overflow: 'hidden', // 테이블 스크롤 처리
-            padding: isLogin ? '0' : '10px', // 로그인 시 패딩 제거
-            justifyContent: isLogin ? 'start' : 'center',
-            alignItems: isLogin ? 'stretch' : 'center',
-        },
-        // 거래 내역 테이블 스타일
-        tableHeader: {
-            display: 'grid',
-            gridTemplateColumns: '1.2fr 0.8fr 0.8fr 0.8fr 1fr',
-            padding: '8px 10px',
-            fontSize: '0.75rem',
-            fontWeight: 'bold',
-            backgroundColor: 'var(--trade-bg)',
-            borderBottom: '1px solid var(--trade-border)',
-            color: 'var(--trade-subtext)',
+            color: '#fff',
             textAlign: 'center',
-        },
-        tableRow: {
-            display: 'grid',
-            gridTemplateColumns: '1.2fr 0.8fr 0.8fr 0.8fr 1fr',
-            padding: '6px 10px',
-            fontSize: '0.8rem',
-            borderBottom: '1px solid var(--trade-border)',
-            textAlign: 'center',
-            alignItems: 'center',
+            padding: '10px',
         }
     };
 
@@ -145,36 +122,8 @@ export default function TopStats() {
             </div>
             
             <div style={styles.bannerArea}>
-                {isLogin ? (
-                    <>
-                        <div style={{padding:'8px 10px', fontSize:'0.9rem', fontWeight:'bold', borderBottom:'1px solid var(--trade-border)'}}>
-                            📋 최근 거래 내역
-                        </div>
-                        <div style={styles.tableHeader}>
-                            <span>체결시간</span>
-                            <span>코인명</span>
-                            <span>마켓</span>
-                            <span>종류</span>
-                            <span>거래수량</span>
-                        </div>
-                        <div style={{overflowY:'auto', flex:1}}>
-                            {recentTrades.map((trade, i) => (
-                                <div key={i} style={styles.tableRow}>
-                                    <span style={{color:'var(--trade-subtext)'}}>{trade.time}</span>
-                                    <span style={{fontWeight:'bold'}}>{trade.coin}</span>
-                                    <span>{trade.market}</span>
-                                    <span style={{color: trade.isBuy ? '#089981' : '#f23645'}}>{trade.type}</span>
-                                    <span>{trade.qty}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        <h3 style={{margin:'0 0 5px 0', fontSize:'1rem'}}>로그인 후 사용하실 수 있습니다</h3>
-                        <p style={{margin:0, fontSize:'0.8rem', color:'var(--trade-subtext)'}}>개인정보 (ex 투자성향, 즐겨찾기, 자금 등)</p>
-                    </>
-                )}
+                <h3 style={{margin:'0 0 5px 0', fontSize:'1rem'}}>로그인 후 사용하실 수 있습니다</h3>
+                <p style={{margin:0, fontSize:'0.8rem', color:'#aaa'}}>개인정보 (ex 투자성향, 즐겨찾기, 자금 등)</p>
             </div>
         </div>
     );
