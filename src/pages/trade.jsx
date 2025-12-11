@@ -1,54 +1,72 @@
-﻿import '../styles/pages/trade.css';
+﻿// src/pages/trade.jsx
 
-import MultiCoinChart from "../components/trade/BinanceChart.jsx"
-
-import ChatBot from "../components/trade/ChatBot.jsx"
-import UserPanel from "../components/trade/UserPanel.jsx"
+import React from 'react';
+import "../styles/pages/trade.css";
 
 import Header from "../components/common/Header.jsx";
 import Footer from "../components/common/Footer.jsx";
-import { useEffect } from 'react';
+import TopStats from "../components/trade/TopStats.jsx";
+import ChatBot from "../components/trade/ChatBot.jsx";
+import TradingViewWidget from "../components/trade/TradingViewWidget.jsx";
 
-export default function TradePage({darkMode}) {
+export default function TradePage() {
     return (
-        <div className="frame">
-            <div className="frame-header">
+        <div className="trade-container">
+            <div className="area-header">
                 <Header />
             </div>
-                                            
-            <div className='frame-main'>
-                <div className='frame-main-top'>
-                    
+
+            <div className="area-top-stats">
+                <TopStats />
+            </div>
+
+            <div className="area-main">
+                {/* 1. 왼쪽: 트레이딩 뷰 (차트) */}
+                <div className="chart-box">
+                    <TradingViewWidget /> 
                 </div>
 
-                <div className="frame-main-botton">
-                    <div className='frame-main-bottom-right'>
-                        <h2>Trading View</h2>
-                        <iframe
-                            style={{ border: "none" }}
-                            src=
-                            {
-                                darkMode ?
-                                "https://s.tradingview.com/widgetembed/?hideideas=1&amp;overrides=%7B%7D&amp;enabled_features=%5B%5D&amp;disabled_features=%5B%5D&amp;locale=kr#%7B%22symbol%22%3A%22BTCUSD%22%2C%22frameElementId%22%3A%22tradingview_d5a8e%22%2C%22interval%22%3A%2215%22%2C%22hide_side_toolbar%22%3A%220%22%2C%22allow_symbol_change%22%3A%221%22%2C%22save_image%22%3A%221%22%2C%22studies%22%3A%22%5B%5D%22%2C%22theme%22%3A%22dark%22%2C%22timezone%22%3A%22Asia%2FSeoul%22%2C%22studies_overrides%22%3A%22%7B%7D%22%2C%22utm_source%22%3A%22coinsect.io%22%2C%22utm_medium%22%3A%22widget%22%2C%22utm_campaign%22%3A%22chart%22%2C%22utm_term%22%3A%22BTCUSD%22%2C%22page-uri%22%3A%22coinsect.io%2F%22%7D" 
-                                :
-                                "https://s.tradingview.com/widgetembed/?hideideas=1&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=kr#%7B%22symbol%22%3A%22BTCUSD%22%2C%22frameElementId%22%3A%22tradingview_d2ee5%22%2C%22interval%22%3A%2215%22%2C%22hide_side_toolbar%22%3A%220%22%2C%22allow_symbol_change%22%3A%221%22%2C%22save_image%22%3A%221%22%2C%22studies%22%3A%22%5B%5D%22%2C%22theme%22%3A%22light%22%2C%22timezone%22%3A%22Asia%2FSeoul%22%2C%22studies_overrides%22%3A%22%7B%7D%22%2C%22utm_source%22%3A%22coinsect.io%22%2C%22utm_medium%22%3A%22widget%22%2C%22utm_campaign%22%3A%22chart%22%2C%22utm_term%22%3A%22BTCUSD%22%2C%22page-uri%22%3A%22coinsect.io%2F%22%7D"
-                            }
-                            width="100%"
-                            height="100%"
-                            allowTransparency={true}
-                        />
+                {/* 2. 중앙: 관심종목 리스트 (Watchlist) */}
+                <div className="watchlist-box">
+                    <div className="list-header">
+                        <span>Symbol</span>
+                        <span>Last</span>
+                        <span>Chg%</span>
                     </div>
-                    <div className='frame-main-bottom-left'>
-                        <ChatBot 
-                        className='frame-main-right-bottom-chatbot'/>
+                    <div className="list-content">
+                        {[
+                            {s: "BTCUSD", p: "94,500", c: "-2.41%", up: false},
+                            {s: "ETHUSD", p: "3,240", c: "+1.20%", up: true},
+                            {s: "XRPUSD", p: "1.45", c: "-0.50%", up: false},
+                            {s: "SOLUSD", p: "145.20", c: "+5.12%", up: true},
+                            {s: "DOGE", p: "0.34", c: "+0.00%", up: true},
+                            {s: "ADA", p: "1.02", c: "-1.15%", up: false},
+                            {s: "AVAX", p: "34.50", c: "+2.30%", up: true},
+                            {s: "DOT", p: "7.80", c: "-0.45%", up: false},
+                            {s: "LINK", p: "14.20", c: "+3.10%", up: true},
+                            {s: "MATIC", p: "0.85", c: "-0.90%", up: false},
+                        ].map((coin, i) => (
+                            <div key={i} className="list-row">
+                                <span className="coin-name">{coin.s}</span>
+                                <span className={coin.up ? "text-up" : "text-down"}>{coin.p}</span>
+                                <span className={`badge ${coin.up ? "bg-up" : "bg-down"}`}>{coin.c}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* 3. 오른쪽: 채팅봇 */}
+                <div className="chat-box">
+                    <div className="panel-title">Chat Assistant</div>
+                    <div className="chat-content-area">
+                        <ChatBot />
                     </div>
                 </div>
             </div>
 
-            <div className="frame-footer">
+            <div className="area-footer">
                 <Footer />
             </div>
         </div>
     );
 }
-

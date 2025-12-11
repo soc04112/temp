@@ -1,95 +1,29 @@
-﻿import "../../styles/common/Header.css"
+﻿// src/components/common/Header.jsx
 
-import { useUpbitTicker } from '../../services/Socket/UpbitSocket.jsx';
-
-import BitcoinLogo from '../../assets/Bitcoin_logo.png';
-import EthuLogo from '../../assets/Ethereum_logo.png';
-import DogeLogo from '../../assets/Doge_log.png';
-import SolanaLogo from '../../assets/Solana_logo.png';
-import XRPLogo from '../../assets/XRP_logo.png';
-
-import { useEffect, useState } from "react";
-
+import "../../styles/common/Header.css";
+// 마리오 이미지 (public/assets 폴더에 이미지가 있다고 가정하거나, 없으면 텍스트만 나옵니다)
+// import MarioIcon from '../../assets/mario_icon.png'; 
 
 export default function Header() {
-
-    const { btcPrice, ethPrice, dogePrice, solPrice, xrpPrice } = useUpbitTicker();
-    
     return (
-        <div className="custom-header">
-            <div className="header-title">
-                <h2>Arena Bot Trading</h2>
+        <div className="custom-header-content">
+            {/* 좌측: 투자 마리오 로고 */}
+            <div className="mario-logo">
+                <span className="text-red">투자</span>
+                {/* 이미지가 있다면 아래 img 태그 주석 해제 */}
+                {/* <img src="/assets/mario_face.png" alt="mario" className="mario-img" /> */}
+                <div className="mario-icon-placeholder">M</div> {/* 이미지 없을 때 임시 아이콘 */}
+                <span className="text-blue">마리오</span>
             </div>
-            <div className="header-ticker-container">
-                
-                <div className="total">
-                    <div className="TICKER">
-                        <a href="https://kr.investing.com/crypto/bitcoin"
-                            target="_blank"
-                            rel="noopener noreferrer">
-                            <img
-                                src={BitcoinLogo}
-                            />
-                            BTC
-                        </a>
-                        <label>{btcPrice} KRW</label>
-                    </div>
-                    <div className="TICKER">
-                        <a href="https://kr.investing.com/indices/investing.com-eth-usd"
-                            target="_blank"
-                            rel="noopener noreferrer">
-                            <img
-                                src={EthuLogo}
-                            />
-                            ETH
-                        </a>
-                        <label>{ethPrice} KRW</label>
-                    </div>
-                </div>
 
-                <div className="only">
-                    <div className="TICKER">
-                        <a href="https://kr.investing.com/indices/investing.com-doge-usd"
-                            target="_blank"
-                            rel="noopener noreferrer">
-                            <img
-                                src={DogeLogo}
-                            />
-                            DOGE
-                        </a>
-                        <label>{dogePrice} KRW</label>
-                    </div>
-                    <div className="TICKER">
-                        <a href="https://kr.investing.com/indices/investing.com-sol-usd"
-                            target="_blank"
-                            rel="noopener noreferrer">
-                            <img
-                                src={SolanaLogo}
-                            />
-                            SOL
-                        </a>
-                        <label>{solPrice} KRW</label>
-                    </div>
-                    <div className="TICKER">
-                        <a href="https://kr.investing.com/indices/investing.com-xrp-usd"
-                            target="_blank"
-                            rel="noopener noreferrer">
-                            <img
-                                src={XRPLogo}
-                            />
-                            XRP
-                        </a>
-                        <label>{xrpPrice} KRW</label>
-                    </div>
-                </div>
-                
-            </div>
-            <div className="header-login-sign">
-                <button className="login-button">
-                    
-                </button>
-                <button className="sign-button">
-                    
+            {/* 중앙: (비워두거나 필요한 경우 티커 배치) */}
+            <div className="header-spacer"></div>
+
+            {/* 우측: 유틸리티 버튼 */}
+            <div className="header-utils">
+                <button className="icon-btn">☀</button> {/* 다크모드 토글 */}
+                <button className="login-btn">
+                    <i className="fa-solid fa-right-to-bracket"></i> 로그인
                 </button>
             </div>
         </div>

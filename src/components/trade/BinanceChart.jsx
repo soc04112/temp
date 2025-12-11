@@ -281,7 +281,7 @@ export default function FapiMultiCoinChart() {
   };
 
   return (
-    <div className="chart-container">
+    <div className="chart-container" style={{ display: 'block', padding: 0 }}>
       <div className="chart">
         <div className="chart-Ticker">
           <img
@@ -320,41 +320,8 @@ export default function FapiMultiCoinChart() {
           series={[{ name: selectedCoin, data: displayData }]}
           type={chartType}
           className="coin-candle-chart"
+          height={550} // 높이를 고정하거나 부모에 맞춤
         />
-      </div>
-      <div className="order-book-container">
-        <div className="search-wrapper" style={{ position: "relative", width: "100%" }}>
-          <input
-            type="text"
-            className="ticker-search"
-            value={searchTicker}
-            onChange={handleInputChange}
-            onKeyDown={(e) => { if(e.key === "Enter") handleTickerEnter(); }}
-            placeholder="Search coin..."
-          />
-          {invalidTicker && <p style={{ color: "red", marginTop: "5px" }}>티커가 없습니다.</p>}
-          {suggestions.length > 0 && (
-            <div className="ticker-suggestions">
-              {suggestions.map(s => (
-                <div
-                  key={s}
-                  className="suggestion-item"
-                  onClick={() => {
-                    setSelectedCoin(s);
-                    setSearchTicker("");
-                    setSuggestions([]);
-                    setInvalidTicker(false);
-                  }}
-                >
-                  {s}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* 호가창 추가 */}
-        <OrderBook className="order-book" symbol={selectedCoin} />
       </div>
     </div>
   );
