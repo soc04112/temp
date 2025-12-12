@@ -1,9 +1,15 @@
 ﻿// src/components/common/Header.jsx
 
 import "../../styles/common/Header.css";
+import { useState } from 'react';
+// ★ 수정 1: ProfileModal 임포트
+import ProfileModal from '../dashboard/ProfileModal.jsx'; 
 
 export default function Header({ darkMode, setDarkMode, isLogin }) {
     
+    // ★ 수정 2: 프로필 모달 상태 추가
+    const [showProfileModal, setShowProfileModal] = useState(false);
+
     const handleLogin = () => {
         localStorage.setItem("isLogin", "true");
         window.location.reload();
@@ -18,7 +24,6 @@ export default function Header({ darkMode, setDarkMode, isLogin }) {
 
     return (
         <div className="custom-header-content">
-            {/* 좌측: 로고 */}
             <div className="mario-logo">
                 <span className="text-red">투자</span>
                 <div className="mario-icon-placeholder">M</div>
@@ -27,9 +32,7 @@ export default function Header({ darkMode, setDarkMode, isLogin }) {
 
             <div className="header-spacer"></div>
 
-            {/* 우측: 유틸리티 버튼 */}
             <div className="header-utils">
-                
                 {isLogin ? (
                     <>
                         <div className="user-info-bar">
@@ -37,25 +40,24 @@ export default function Header({ darkMode, setDarkMode, isLogin }) {
                                 <span className="label">자금:</span>
                                 <span className="value">$10,000</span>
                             </div>
-                            
                             <div className="info-item">
                                 <span className="label">등급:</span>
                                 <span className="value badge-master">master</span>
                             </div>
-
-                            {/* 사용자명 */}
                             <span className="user-name"><strong>MASTER</strong>님</span>
                         </div>
 
                         <div className="divider"></div>
 
-                        {/* ★ 위치 이동: 내 정보 상세 버튼 */}
-                        {/* 클래스도 icon-btn으로 변경하여 다크모드 버튼과 크기 통일 */}
-                        <button className="icon-btn" title="내 정보 상세">
+                        {/* ★ 수정 3: 클릭 시 모달 열기 (setShowProfileModal(true)) */}
+                        <button 
+                            className="icon-btn" 
+                            title="내 정보 상세"
+                            onClick={() => setShowProfileModal(true)}
+                        >
                             <i className="fa-solid fa-user-gear"></i>
                         </button>
 
-                        {/* 다크모드 버튼 */}
                         <button 
                             className="icon-btn" 
                             onClick={() => setDarkMode(prev => !prev)}
@@ -64,7 +66,6 @@ export default function Header({ darkMode, setDarkMode, isLogin }) {
                             {darkMode ? '☀️' : '🌙'}
                         </button>
                         
-                        {/* 로그아웃 버튼 */}
                         <button className="logout-btn" onClick={handleLogout}>
                             로그아웃
                         </button>
@@ -85,6 +86,11 @@ export default function Header({ darkMode, setDarkMode, isLogin }) {
                     </>
                 )}
             </div>
+
+            {/* ★ 수정 4: 모달 컴포넌트 렌더링 */}
+            {showProfileModal && (
+                <ProfileModal onClose={() => setShowProfileModal(false)} />
+            )}
         </div>
     )
 }
