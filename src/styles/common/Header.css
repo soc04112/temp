@@ -88,7 +88,14 @@
 .info-item .label { color: #888; }
 .info-item .value { font-weight: bold; }
 
+/* 등급 배지 스타일 */
 .badge-gold { color: #ffd700; text-shadow: 0 0 5px rgba(255, 215, 0, 0.3); }
+.badge-master { 
+    color: #d500f9; 
+    text-shadow: 0 0 5px rgba(213, 0, 249, 0.4); 
+    font-weight: 800;
+    text-transform: uppercase;
+}
 
 .divider {
     width: 1px;
@@ -97,14 +104,37 @@
     margin: 0 5px;
 }
 
+.icon-btn {
+    background: none;
+    border: none;
+    color: var(--trade-text); /* trade.css 변수 사용 */
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
 .icon-btn-small {
     background: none;
     border: none;
     color: var(--trade-text);
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 1rem; /* 아이콘 크기 살짝 키움 */
     padding: 5px;
+    display: flex;
+    align-items: center;
 }
+.icon-btn-small:hover { opacity: 0.8; }
+
+.login-btn {
+    background-color: #2962ff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+.login-btn:hover { background-color: #1e4bd1; }
 
 .logout-btn {
     background-color: #444;
