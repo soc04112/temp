@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import { Settings } from "lucide-react";
 
 import { getDB } from "./components/common/OpenDB.jsx"
+import GoogleRedirect from './components/GoogleLogin/GoogleRedirect.jsx';
 
 function App() {
 
@@ -45,6 +46,7 @@ function App() {
                         path="/trade" 
                         element={<Trade darkMode={darkMode} setDarkMode={setDarkMode} />} 
                     />
+                    <Route path="/oauth/callback" element={<GoogleRedirect />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                 </Routes>
             </BrowserRouter>

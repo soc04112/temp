@@ -3,6 +3,7 @@
 import "../../styles/common/Header.css";
 import { useState } from 'react';
 import ProfileModal from '../dashboard/ProfileModal.jsx'; 
+import GoogleLogin from '../../components/GoogleLogin/GoogleLogin.jsx'
 
 export default function Header({ darkMode, setDarkMode, isLogin }) {
         
@@ -90,9 +91,13 @@ export default function Header({ darkMode, setDarkMode, isLogin }) {
                             {darkMode ? '☀️' : '🌙'}
                         </button>
 
-                        <button className="login-btn" onClick={handleLogin}>
+                        <dev className="login-btn">
+                            <GoogleLogin />
+                        </dev>
+                        
+                        {/* <button className="login-btn" onClick={handleLogin}>
                             <i className="fa-solid fa-right-to-bracket"></i> 로그인
-                        </button>
+                        </button> */}
                     </>
                 )}
             </div>
