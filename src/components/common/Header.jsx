@@ -3,13 +3,16 @@
 import "../../styles/common/Header.css";
 import { useState } from 'react';
 import ProfileModal from '../dashboard/ProfileModal.jsx'; 
-import GoogleLogin from '../../components/GoogleLogin/GoogleLogin.jsx'
+import GoogleLogin from '../GoogleLogin/GoogleLogin.jsx';
 
 export default function Header({ darkMode, setDarkMode, isLogin }) {
         
     const [showProfileModal, setShowProfileModal] = useState(false);
 
-    const handleLogin = () => {
+    const handleLoginSuccess = (response) => {
+        console.log("Google Login Success:", response);
+        // 실제로는 여기서 백엔드로 code를 보내 토큰을 받아야 하지만,
+        // UI 구현 단계에서는 기존처럼 로컬스토리지 처리로 진행합니다.
         localStorage.setItem("isLogin", "true");
         window.location.reload();
     };
@@ -91,9 +94,12 @@ export default function Header({ darkMode, setDarkMode, isLogin }) {
                             {darkMode ? '☀️' : '🌙'}
                         </button>
 
-                        <dev className="login-btn">
-                            <GoogleLogin />
-                        </dev>
+                        <div className="login-btn-wrapper"> 
+                            <GoogleLogin 
+                                darkMode={darkMode} 
+                                onLoginSuccess={handleLoginSuccess} 
+                            />
+                        </div>
                         
                         {/* <button className="login-btn" onClick={handleLogin}>
                             <i className="fa-solid fa-right-to-bracket"></i> 로그인

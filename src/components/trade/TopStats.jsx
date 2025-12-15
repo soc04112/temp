@@ -22,11 +22,9 @@ export default function TopStats({ isLogin }) {
         { label: "24시간 청산", short: "106.65M", long: "94.41M", total: "201.06M" },
     ];
 
-    // 2. [현물] 포지션 데이터
+    // 2. [선물] 포지션 데이터
     const positionData = [
         { coin: "BTC", type: "매수", entry: "92,100", pnl: "+1,250", value: "15,200", isWin: true },
-        { coin: "ETH", type: "매도", entry: "3,350", pnl: "+450", value: "4,500", isWin: true },
-        { coin: "XRP", type: "매수", entry: "1.48", pnl: "-15", value: "850", isWin: false },
     ];
 
     // 3. [현물] 보유 코인 데이터
@@ -41,6 +39,8 @@ export default function TopStats({ isLogin }) {
     const historyData = [
         { time: "14:02", coin: "BTC", market: "USDT", type: "매수", qty: "0.005", isBuy: true },
         { time: "13:45", coin: "ETH", market: "USDT", type: "매도", qty: "1.2", isBuy: false },
+        { time: "11:20", coin: "XRP", market: "KRW", type: "매수", qty: "500", isBuy: true },
+        { time: "09:15", coin: "SOL", market: "USDT", type: "매수", qty: "10", isBuy: true },
         { time: "11:20", coin: "XRP", market: "KRW", type: "매수", qty: "500", isBuy: true },
         { time: "09:15", coin: "SOL", market: "USDT", type: "매수", qty: "10", isBuy: true },
     ];
@@ -196,7 +196,7 @@ export default function TopStats({ isLogin }) {
     const renderPositionTable = () => (
         <div style={styles.historyBox}>
             <div style={styles.sectionHeader}>
-                <span>⚡ 포지션 (현물)</span>
+                <span>⚡ 포지션 (선물)</span>
                 <span style={{fontSize:'0.7rem', color:'var(--trade-subtext)'}}>{positionData.length}건</span>
             </div>
             <div style={styles.posHeader}>
