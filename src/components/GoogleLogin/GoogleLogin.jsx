@@ -26,7 +26,8 @@ export default function GoogleLogin({ darkMode, onLoginSuccess }) {
         if (onLoginSuccess) onLoginSuccess(codeResponse);
     },
     flow: 'auth-code',
-    // redirect_uri: import.meta.env.VITE_REDIRECT_URL,
+    ux_mode: 'redirect',
+    redirect_uri: import.meta.env.VITE_REDIRECT_URL,
     onError: () => console.log("Login Failed")
   });
 
