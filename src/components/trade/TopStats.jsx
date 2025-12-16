@@ -14,7 +14,7 @@ const coinIcons = {
 };
 
 export default function TopStats({ isLogin }) {
-    // 1. 청산 현황 데이터
+    // 1. 청산 현황
     const statsData = [
         { label: "1시간 청산", short: "1.30M", long: "8.04M", total: "9.34M" },
         { label: "4시간 청산", short: "3.49M", long: "13.77M", total: "17.26M" },
@@ -22,9 +22,11 @@ export default function TopStats({ isLogin }) {
         { label: "24시간 청산", short: "106.65M", long: "94.41M", total: "201.06M" },
     ];
 
-    // 2. [선물] 포지션 데이터
+    // 2. [현물] 포지션 데이터
     const positionData = [
         { coin: "BTC", type: "매수", entry: "92,100", pnl: "+1,250", value: "15,200", isWin: true },
+        { coin: "ETH", type: "매도", entry: "3,350", pnl: "+450", value: "4,500", isWin: true },
+        { coin: "XRP", type: "매수", entry: "1.48", pnl: "-15", value: "850", isWin: false },
     ];
 
     // 3. [현물] 보유 코인 데이터
@@ -35,14 +37,13 @@ export default function TopStats({ isLogin }) {
         { coin: "SOL", amount: "150", entry: "85.5", roe: "-2.1%", value: "21,500", isWin: false },
     ];
 
-    // 4. 통합 거래 내역
+    // 4. 통합 거래 내역 (★ category 항목 추가됨)
     const historyData = [
-        { time: "14:02", coin: "BTC", market: "USDT", type: "매수", qty: "0.005", isBuy: true },
-        { time: "13:45", coin: "ETH", market: "USDT", type: "매도", qty: "1.2", isBuy: false },
-        { time: "11:20", coin: "XRP", market: "KRW", type: "매수", qty: "500", isBuy: true },
-        { time: "09:15", coin: "SOL", market: "USDT", type: "매수", qty: "10", isBuy: true },
-        { time: "11:20", coin: "XRP", market: "KRW", type: "매수", qty: "500", isBuy: true },
-        { time: "09:15", coin: "SOL", market: "USDT", type: "매수", qty: "10", isBuy: true },
+        { time: "14:02", coin: "BTC", market: "USDT", category: "선물", type: "매수", qty: "0.005", isBuy: true },
+        { time: "13:45", coin: "ETH", market: "USDT", category: "현물", type: "매도", qty: "1.2", isBuy: false },
+        { time: "11:20", coin: "XRP", market: "KRW", category: "현물", type: "매수", qty: "500", isBuy: true },
+        { time: "09:15", coin: "SOL", market: "USDT", category: "선물", type: "매수", qty: "10", isBuy: true },
+        { time: "어제", coin: "ADA", market: "USDT", category: "선물", type: "매도", qty: "150", isBuy: false },
     ];
 
     const styles = {
@@ -89,7 +90,7 @@ export default function TopStats({ isLogin }) {
 
         // --- 텍스트 스타일 ---
         title: {
-            fontSize: '0.9rem', // 폰트 다시 키움
+            fontSize: '0.9rem',
             color: 'var(--trade-text)', 
             marginBottom: '8px',
             fontWeight: 'bold',
@@ -142,6 +143,7 @@ export default function TopStats({ isLogin }) {
             alignItems: 'center',
         },
         
+        // 포지션 헤더
         posHeader: {
             display: 'grid',
             gridTemplateColumns: '0.9fr 0.8fr 1fr 1fr 1.2fr', 
@@ -149,6 +151,7 @@ export default function TopStats({ isLogin }) {
             backgroundColor: 'var(--trade-bg)', borderBottom: '1px solid var(--trade-border)',
             color: 'var(--trade-subtext)', textAlign: 'center', 
         },
+        // 보유코인 헤더
         holdHeader: {
             display: 'grid',
             gridTemplateColumns: '0.9fr 0.9fr 1fr 1fr 1.2fr', 
@@ -156,9 +159,11 @@ export default function TopStats({ isLogin }) {
             backgroundColor: 'var(--trade-bg)', borderBottom: '1px solid var(--trade-border)',
             color: 'var(--trade-subtext)', textAlign: 'center', 
         },
+        // ★ 거래내역 헤더 (6개 컬럼으로 변경)
         histHeader: {
             display: 'grid',
-            gridTemplateColumns: '0.7fr 0.8fr 0.7fr 0.7fr 0.8fr', 
+            // 시간 | 코인 | 마켓 | 구분 | 종류 | 수량
+            gridTemplateColumns: '0.7fr 0.8fr 0.6fr 0.6fr 0.6fr 0.8fr', 
             padding: '6px 0', fontSize: '0.65rem', fontWeight: 'bold',
             backgroundColor: 'var(--trade-bg)', borderBottom: '1px solid var(--trade-border)',
             color: 'var(--trade-subtext)', textAlign: 'center', 
@@ -180,6 +185,7 @@ export default function TopStats({ isLogin }) {
         },
         coinIcon: { width: '12px', height: '12px', borderRadius: '50%' },
         
+        // 배지 스타일
         badgeLong: {
             backgroundColor: 'rgba(8, 153, 129, 0.15)', color: '#089981',
             padding: '1px 3px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 'bold'
@@ -188,11 +194,21 @@ export default function TopStats({ isLogin }) {
             backgroundColor: 'rgba(242, 54, 69, 0.15)', color: '#f23645',
             padding: '1px 3px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 'bold'
         },
+        // ★ 구분(선물/현물) 배지 스타일
+        badgeSpot: {
+            backgroundColor: 'rgba(41, 98, 255, 0.1)', color: '#2962ff',
+            padding: '1px 3px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 'bold'
+        },
+        badgeFuture: {
+            backgroundColor: 'rgba(255, 152, 0, 0.1)', color: '#ff9800',
+            padding: '1px 3px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 'bold'
+        },
+
         pnlWin: { color: '#089981', fontWeight: 'bold' },
         pnlLose: { color: '#f23645', fontWeight: 'bold' },
     };
 
-    // [1] 현물 포지션 테이블
+    // [1] 현물 포지션
     const renderPositionTable = () => (
         <div style={styles.historyBox}>
             <div style={styles.sectionHeader}>
@@ -213,9 +229,7 @@ export default function TopStats({ isLogin }) {
                             <img src={coinIcons[pos.coin]} alt="" style={styles.coinIcon} />
                             <span>{pos.coin}</span>
                         </div>
-                        <div>
-                            <span style={pos.type === '매수' ? styles.badgeLong : styles.badgeShort}>{pos.type}</span>
-                        </div>
+                        <div><span style={pos.type === '매수' ? styles.badgeLong : styles.badgeShort}>{pos.type}</span></div>
                         <span style={{color:'var(--trade-subtext)'}}>{pos.entry}</span>
                         <span style={pos.isWin ? styles.pnlWin : styles.pnlLose}>{pos.pnl}</span>
                         <span style={{fontWeight:'bold'}}>${pos.value}</span>
@@ -225,7 +239,7 @@ export default function TopStats({ isLogin }) {
         </div>
     );
 
-    // [2] 현물 보유코인 테이블
+    // [2] 현물 보유코인
     const renderHoldingTable = () => (
         <div style={styles.historyBox}>
             <div style={styles.sectionHeader}>
@@ -256,7 +270,7 @@ export default function TopStats({ isLogin }) {
         </div>
     );
 
-    // [3] 거래 내역 테이블
+    // [3] 거래 내역 (★ 구분 컬럼 추가됨)
     const renderHistoryTable = () => (
         <div style={styles.historyBox}>
             <div style={styles.sectionHeader}>
@@ -267,18 +281,27 @@ export default function TopStats({ isLogin }) {
                 <span>시간</span>
                 <span>코인</span>
                 <span>마켓</span>
+                <span>구분</span> {/* 추가됨 */}
                 <span>종류</span>
                 <span>수량</span>
             </div>
             <div style={{overflowY:'auto', flex:1}} className="custom-scroll">
                 {historyData.map((trade, i) => (
-                    <div key={i} style={{...styles.tableRow, gridTemplateColumns: '0.7fr 0.8fr 0.7fr 0.7fr 0.8fr'}}>
+                    <div key={i} style={{...styles.tableRow, gridTemplateColumns: '0.7fr 0.8fr 0.6fr 0.6fr 0.6fr 0.8fr'}}>
                         <span style={{color:'var(--trade-subtext)'}}>{trade.time}</span>
                         <div style={styles.coinWrapper}>
                             <img src={coinIcons[trade.coin]} alt="" style={styles.coinIcon} />
                             <span>{trade.coin}</span>
                         </div>
                         <span style={{color:'var(--trade-subtext)'}}>{trade.market}</span>
+                        
+                        {/* ★ 구분 컬럼 (현물/선물) */}
+                        <div>
+                            <span style={trade.category === '선물' ? styles.badgeFuture : styles.badgeSpot}>
+                                {trade.category}
+                            </span>
+                        </div>
+                        
                         <div>
                             <span style={trade.isBuy ? styles.badgeLong : styles.badgeShort}>{trade.type}</span>
                         </div>
@@ -291,22 +314,19 @@ export default function TopStats({ isLogin }) {
 
     return (
         <div style={styles.container}>
-            {/* 좌측: 청산 현황 (내용 복구) */}
+            {/* 좌측: 청산 현황 */}
             <div style={styles.cardsArea}>
                 {statsData.map((stat, idx) => (
                     <div key={idx} style={styles.card}>
                         <div style={styles.title}>⚡ {stat.label}</div>
-                        {/* ★ 수정: '롱 청산' 풀네임 복구 */}
                         <div style={styles.row_long}>
                             <span style={{color:'var(--trade-subtext)'}}>롱 청산</span>
                             <span style={styles.longText}>${stat.long}</span>
                         </div>
-                        {/* ★ 수정: '숏 청산' 풀네임 복구 */}
                         <div style={styles.row_short}>
                             <span style={{color:'var(--trade-subtext)'}}>숏 청산</span>
                             <span style={styles.shortText}>${stat.short}</span>
                         </div>
-                        {/* ★ 수정: '총 청산' 라벨 복구 */}
                         <div style={styles.row_total}>
                             <span>총 청산</span>
                         </div>
