@@ -1,6 +1,12 @@
 // src/components/trade/TopStats.jsx
 
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import axios from 'axios';
+import CryptoJS from 'crypto-js';
+
+// 🚨 API 키와 Secret 로드 (Vite 환경 변수 사용)
+const API_KEY = import.meta.env.VITE_BINGX_API_KEY; // User Information > bingx_access_key
+const API_SECRET = import.meta.env.VITE_BINGX_API_SECRET; // User Information > bingx_secret_key
 
 // 코인 아이콘
 const coinIcons = {
@@ -13,7 +19,221 @@ const coinIcons = {
     USDT: "https://cryptologos.cc/logos/tether-usdt-logo.png?v=025",
 };
 
-export default function TopStats({ isLogin }) {
+const API_CONFIG = {
+    "uri": "/openApi/swap/v2/user/positions",
+    "method": "GET",
+    "payload": {
+        "symbol": "BTC-USDT" // 원하는 심볼로 변경 가능
+    },
+};
+
+function getParameters(API, timestamp, urlEncode = false) {
+    let parameters = "";
+    for (const key in API.payload) {
+        if (Object.prototype.hasOwnProperty.call(API.payload, key)) {
+            const value = API.payload[key];
+            if (urlEncode) {
+                parameters += key + "=" + encodeURIComponent(value) + "&";
+            } else {
+                parameters += key + "=" + value + "&";
+            }
+        }
+    }
+
+    if (parameters) {
+        parameters = parameters.substring(0, parameters.length - 1);
+        parameters = parameters + "&timestamp=" + timestamp;
+    } else {
+        parameters = "timestamp=" + timestamp;
+    }
+    return parameters;
+}
+
+async function fetchBingXPositions() {
+    if (!API_KEY || !API_SECRET) {
+        throw new Error("API Key/Secret이 설정되지 않았습니다.");
+    }
+
+    const timestamp = new Date().getTime();
+
+    // 1. Signature 생성
+    const parameterString = getParameters(API_CONFIG, timestamp);
+    const sign = CryptoJS.enc.Hex.stringify(CryptoJS.HmacSHA256(parameterString, API_SECRET));
+
+    // 2. 최종 URL 생성 (프록시 경로를 사용: /api + URI + 쿼리)
+    const url = 
+        API_CONFIG.uri + 
+        "?" + 
+        getParameters(API_CONFIG, timestamp, true) + 
+        "&signature=" + sign;
+
+    const config = {
+        method: API_CONFIG.method,
+        url: `/api${url}`, // 프록시가 인식하도록 '/api' 접두사 사용
+        headers: {
+            'X-BX-APIKEY': API_KEY,
+        },
+        transformResponse: (resp) => {
+            // BigInt 이슈 처리 (15자리 이상 숫자를 문자열로 변환하여 파싱)
+            const jsonWithBigIntToString = resp.replace(/:(\d{15,})(?=[,}\]])/g, (_, p1) => `:"${p1}"`);
+            try {
+                 return JSON.parse(jsonWithBigIntToString);
+            } catch (e) {
+                 console.error("JSON 파싱 오류", e);
+                 return { code: -1, msg: "JSON 파싱 오류", originalResponse: resp }; 
+            }
+        }
+    };
+
+    const resp = await axios(config);
+    return resp.data;
+}
+
+export default function TopStats({ isLogin, analzeData, walletData }) {
+    const [position, setPosition] = useState({})
+    const [owner_coin, setOwner_Coin] = useState({})
+    const [trade_coin, setTrade_Coin] = useState({})
+    const [_time, setTime] = useState("")
+
+    const prevAnalzeRef = useRef(null);
+    const prevWalletRef = useRef(null);
+
+    const [positionData, setPositionData] = useState([]);
+    const [loadingPositions, setLoadingPositions] = useState(true);
+    const [positionError, setPositionError] = useState(null);
+
+    useEffect(() => {
+        if (!isLogin) {
+             setPositionData([]);
+             setLoadingPositions(false);
+             setPositionError(null);
+             return; 
+        }
+
+        const fetchAndSetPositions = () => {
+             // 데이터 로딩 로직 (이전과 동일)
+             fetchBingXPositions()
+                .then(result => {
+                    if (result.code === 0) {
+                        const transformedData = (result.data || []).map(pos => {
+                            const unrealizedProfit = parseFloat(pos.unrealizedProfit);
+                            const realizedProfit = parseFloat(pos.realisedProfit);
+                            const coinSymbol = pos.symbol.split('-')[0];
+
+                            return {
+                                coin: coinSymbol, 
+                                type: pos.positionSide === 'LONG' ? '매수' : '매도', 
+                                entry: parseFloat(pos.avgPrice).toLocaleString(), 
+                                amount: parseFloat(pos.positionAmt).toLocaleString(undefined, { maximumFractionDigits: 4 }), 
+                                pnl: `${unrealizedProfit >= 0 ? '+' : ''}${unrealizedProfit.toFixed(4)}`, 
+                                realizedPnl: `${realizedProfit >= 0 ? '+' : ''}${realizedProfit.toFixed(4)}`, 
+                                liquidationPrice: parseFloat(pos.liquidationPrice).toFixed(4), 
+                                isWin: unrealizedProfit >= 0,
+                                isRealizedWin: realizedProfit >= 0,
+                                leverage: pos.leverage,
+                            };
+                        });
+                        setPositionData(transformedData);
+                        setPositionError(null);
+                    } else {
+                        setPositionError(`API 오류 (Code: ${result.code}): ${result.msg}`);
+                    }
+                })
+                .catch(err => {
+                    console.error("Position Fetch Error:", err);
+                    setPositionError(`데이터 로드 실패: ${err.message}`);
+                })
+                .finally(() => {
+                    setLoadingPositions(false);
+                });
+        };
+
+        // 1. 컴포넌트 마운트 시 즉시 한 번 호출
+        fetchAndSetPositions();
+
+        // 2. ★ 1초(1000ms)마다 주기적으로 호출하여 업데이트 ★
+        const intervalId = setInterval(fetchAndSetPositions, 3000); 
+
+        // 3. 클린업 함수: 컴포넌트가 언마운트되거나 useEffect가 다시 실행될 때 타이머를 해제
+        return () => clearInterval(intervalId);
+
+    }, [isLogin]); // isLogin 상태가 변경될 때만 다시 실행
+
+    useEffect(() => {
+        if (!analzeData) return;
+    
+        if (prevAnalzeRef.current &&
+            JSON.stringify(prevAnalzeRef.current) === JSON.stringify(analzeData)
+        ) {
+            return; // 완전히 같으면 아무 것도 안 함
+        }
+
+        const keys = Object.keys(analzeData);
+
+        keys.forEach(key => {
+            const value = analzeData[key];
+
+            setPosition(value.position[value.position.length - 1]);
+
+            const rawTime = value.time[value.time.length - 1];
+
+            const localTime = new Date(rawTime).toLocaleString('ko-KR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+
+            setTime(localTime);
+        });
+        prevAnalzeRef.current = analzeData;
+   
+    }, [analzeData]);
+
+    useEffect(() => {
+        if (!walletData) return;
+
+        if (prevWalletRef.current &&
+            JSON.stringify(prevWalletRef.current) === JSON.stringify(walletData)
+        ) {
+            return;
+        }
+
+        const keys = Object.keys(walletData);
+
+        keys.forEach(key => {
+            const value = walletData[key];
+            setOwner_Coin(value.owner_coin[value.owner_coin.length-1]);
+
+            let current_owner_coin = value.owner_coin[value.owner_coin.length-1]
+            let pre_owner_coin = value.owner_coin[value.owner_coin.length-2]
+            
+            const coinDifference = {};
+            Object.keys(current_owner_coin).forEach((key) => {
+            coinDifference[key] = 
+                (current_owner_coin[key] - pre_owner_coin[key])
+            });
+            setTrade_Coin(coinDifference);
+        });
+        prevWalletRef.current = walletData;
+    
+    }, [walletData])
+
+    useEffect(() => {
+        if (!position || !trade_coin) return;
+
+        const updatedTradeCoin = { ...trade_coin };
+
+        Object.keys(position).forEach((key) => {
+            if (position[key] === "sell" && trade_coin[key] === 0) {
+                updatedTradeCoin[key] = "최소";
+            }
+        });
+
+        setTrade_Coin(updatedTradeCoin);
+
+    }, [position]);
+
     // 1. 청산 현황
     const statsData = [
         { label: "1시간 청산", short: "1.30M", long: "8.04M", total: "9.34M" },
@@ -22,28 +242,22 @@ export default function TopStats({ isLogin }) {
         { label: "24시간 청산", short: "106.65M", long: "94.41M", total: "201.06M" },
     ];
 
-    // 2. [현물] 포지션 데이터
-    const positionData = [
-        { coin: "BTC", type: "매수", entry: "92,100", pnl: "+1,250", value: "15,200", isWin: true },
-        { coin: "ETH", type: "매도", entry: "3,350", pnl: "+450", value: "4,500", isWin: true },
-        { coin: "XRP", type: "매수", entry: "1.48", pnl: "-15", value: "850", isWin: false },
-    ];
-
     // 3. [현물] 보유 코인 데이터
     const holdingData = [
-        { coin: "USDT", amount: "5,420", entry: "1.00", roe: "0.0%", value: "5,420", isWin: true },
-        { coin: "BTC", amount: "0.15", entry: "65,200", roe: "+12.5%", value: "13,800", isWin: true },
-        { coin: "ETH", amount: "2.5", entry: "3,100", roe: "+5.2%", value: "8,100", isWin: true },
-        { coin: "SOL", amount: "150", entry: "85.5", roe: "-2.1%", value: "21,500", isWin: false },
+        { coin: "BTC", amount: owner_coin['BCH'], roe: "+12.5%", value: "13,800", isWin: true },
+        { coin: "ETH", amount: owner_coin['ETH'], roe: "+5.2%", value: "8,100", isWin: true },
+        { coin: "XRP", amount: owner_coin['XRP'], roe: "-2.1%", value: "21,500", isWin: false },
+        { coin: "BCH", amount: owner_coin['BCH'], roe: "-2.1%", value: "21,500", isWin: false },
+        { coin: "SOL", amount: owner_coin['SOL'], roe: "-2.1%", value: "21,500", isWin: false },                
     ];
 
     // 4. 통합 거래 내역 (★ category 항목 추가됨)
     const historyData = [
-        { time: "14:02", coin: "BTC", market: "USDT", category: "선물", type: "매수", qty: "0.005", isBuy: true },
-        { time: "13:45", coin: "ETH", market: "USDT", category: "현물", type: "매도", qty: "1.2", isBuy: false },
-        { time: "11:20", coin: "XRP", market: "KRW", category: "현물", type: "매수", qty: "500", isBuy: true },
-        { time: "09:15", coin: "SOL", market: "USDT", category: "선물", type: "매수", qty: "10", isBuy: true },
-        { time: "어제", coin: "ADA", market: "USDT", category: "선물", type: "매도", qty: "150", isBuy: false },
+        { time: _time, coin: "BTC", market: "KRW", category: "현물", type: position['BTC'], qty: trade_coin['BTC'], isBuy: true },
+        { time: _time, coin: "ETH", market: "KRW", category: "현물", type: position['ETH'], qty: trade_coin['ETH'], isBuy: false },
+        { time: _time, coin: "XRP", market: "KRW", category: "현물", type: position['XRP'], qty: trade_coin['XRP'], isBuy: true },
+        { time: _time, coin: "SOL", market: "KRW", category: "현물", type: position['SOL'], qty: trade_coin['SOL'], isBuy: true },
+        { time: _time, coin: "BCH", market: "KRW", category: "현물", type: position['BCH'], qty: trade_coin['BCH'], isBuy: false },
     ];
 
     const styles = {
@@ -145,8 +359,9 @@ export default function TopStats({ isLogin }) {
         
         // 포지션 헤더
         posHeader: {
-            display: 'grid',
-            gridTemplateColumns: '0.9fr 0.8fr 1fr 1fr 1.2fr', 
+            display: 'grid',            
+            // 코인 | Side | 진입가 | 수량 | 미실현 | 실현 | 청산가
+            gridTemplateColumns: '0.7fr 0.6fr 1fr 0.8fr 1fr 1fr 1fr',  
             padding: '6px 0', fontSize: '0.65rem', fontWeight: 'bold',
             backgroundColor: 'var(--trade-bg)', borderBottom: '1px solid var(--trade-border)',
             color: 'var(--trade-subtext)', textAlign: 'center', 
@@ -154,7 +369,7 @@ export default function TopStats({ isLogin }) {
         // 보유코인 헤더
         holdHeader: {
             display: 'grid',
-            gridTemplateColumns: '0.9fr 0.9fr 1fr 1fr 1.2fr', 
+            gridTemplateColumns: '0.9fr 0.9fr 1fr 1.2fr', 
             padding: '6px 0', fontSize: '0.65rem', fontWeight: 'bold',
             backgroundColor: 'var(--trade-bg)', borderBottom: '1px solid var(--trade-border)',
             color: 'var(--trade-subtext)', textAlign: 'center', 
@@ -213,26 +428,52 @@ export default function TopStats({ isLogin }) {
         <div style={styles.historyBox}>
             <div style={styles.sectionHeader}>
                 <span>⚡ 포지션 (선물)</span>
-                <span style={{fontSize:'0.7rem', color:'var(--trade-subtext)'}}>{positionData.length}건</span>
+                {loadingPositions ? (
+                    <span style={{fontSize:'0.7rem', color:'var(--trade-subtext)'}}>로딩 중...</span>
+                ) : positionError ? (
+                    <span style={{fontSize:'0.7rem', color:'red'}}>오류</span>
+                ) : (
+                    <span style={{fontSize:'0.7rem', color:'var(--trade-subtext)'}}>{positionData.length}건</span>
+                )}
             </div>
             <div style={styles.posHeader}>
                 <span>코인</span>
                 <span>Side</span>
                 <span>진입가</span>
-                <span>PNL</span>
-                <span>평가금</span>
+                <span>수량</span> 
+                <span>미실현</span> 
+                <span>실현</span> 
+                <span>청산가</span>
             </div>
             <div style={{overflowY:'auto', flex:1}} className="custom-scroll">
+                {loadingPositions && (
+                    <div style={{textAlign:'center', padding:'20px', color:'var(--trade-subtext)'}}>포지션 데이터를 불러오는 중...</div>
+                )}
+
+                {!loadingPositions && positionError && (
+                    <div style={{textAlign:'center', padding:'20px', color:'#f23645', wordBreak:'break-all'}}>
+                        API 오류: {positionError}
+                    </div>
+                )}
+
+                {!loadingPositions && !positionError && positionData.length === 0 && (
+                    <div style={{textAlign:'center', padding:'20px', color:'var(--trade-subtext)'}}>
+                        현재 포지션이 없습니다.
+                    </div>
+                )}
+
                 {positionData.map((pos, i) => (
-                    <div key={i} style={{...styles.tableRow, gridTemplateColumns: '0.9fr 0.8fr 1fr 1fr 1.2fr'}}>
+                    <div key={i} style={{...styles.tableRow, gridTemplateColumns: '0.7fr 0.6fr 1fr 0.8fr 1fr 1fr 1fr'}}>
                         <div style={styles.coinWrapper}>
-                            <img src={coinIcons[pos.coin]} alt="" style={styles.coinIcon} />
+                            <img src={coinIcons[pos.coin] || coinIcons.USDT} alt="" style={styles.coinIcon} />
                             <span>{pos.coin}</span>
                         </div>
                         <div><span style={pos.type === '매수' ? styles.badgeLong : styles.badgeShort}>{pos.type}</span></div>
                         <span style={{color:'var(--trade-subtext)'}}>{pos.entry}</span>
+                        <span style={{color:'var(--trade-text)'}}>{pos.amount}</span>
                         <span style={pos.isWin ? styles.pnlWin : styles.pnlLose}>{pos.pnl}</span>
-                        <span style={{fontWeight:'bold'}}>${pos.value}</span>
+                        <span style={pos.isRealizedWin ? styles.pnlWin : styles.pnlLose}>{pos.realizedPnl}</span> 
+                        <span style={{color:'var(--trade-subtext)'}}>{pos.liquidationPrice}</span> 
                     </div>
                 ))}
             </div>
@@ -249,19 +490,17 @@ export default function TopStats({ isLogin }) {
             <div style={styles.holdHeader}>
                 <span>코인</span>
                 <span>수량</span>
-                <span>진입가</span>
                 <span>수익률</span>
                 <span>평가금</span>
             </div>
             <div style={{overflowY:'auto', flex:1}} className="custom-scroll">
                 {holdingData.map((hold, i) => (
-                    <div key={i} style={{...styles.tableRow, gridTemplateColumns: '0.9fr 0.9fr 1fr 1fr 1.2fr'}}>
+                    <div key={i} style={{...styles.tableRow, gridTemplateColumns: '0.9fr 0.9fr 1fr 1.2fr'}}>
                         <div style={styles.coinWrapper}>
                             <img src={coinIcons[hold.coin]} alt="" style={styles.coinIcon} />
                             <span>{hold.coin}</span>
                         </div>
                         <span style={{color:'var(--trade-text)'}}>{hold.amount}</span>
-                        <span style={{color:'var(--trade-subtext)'}}>{hold.entry}</span>
                         <span style={hold.isWin ? styles.pnlWin : styles.pnlLose}>{hold.roe}</span>
                         <span style={{fontWeight:'bold'}}>${hold.value}</span>
                     </div>

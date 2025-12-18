@@ -8,7 +8,6 @@
     });
 
     const data = await res.json();
-    console.log(data)
     if (data.message === "signclear")
     {
         alert("회원 가입 성공")

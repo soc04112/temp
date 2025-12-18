@@ -26,13 +26,13 @@ export default function GoogleLogin({ darkMode, onLoginSuccess }) {
         if (onLoginSuccess) onLoginSuccess(codeResponse);
     },
     flow: 'auth-code',
-    ux_mode: 'redirect',
+    ux_mode: 'redirect',    
     redirect_uri: import.meta.env.VITE_REDIRECT_URL,
     onError: () => console.log("Login Failed")
   });
 
   return (
-        <button className="login-btn" onClick={() => login()}>
+      <button className="login-btn" onClick={() => login()}>
           <i className="fa-solid fa-right-to-bracket"></i> 로그인
       </button>
   );

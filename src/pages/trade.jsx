@@ -10,10 +10,14 @@ import ChatBot from "../components/trade/ChatBot.jsx";
 import TradingViewWidget from "../components/trade/TradingViewWidget.jsx";
 import TradeData from './services/Trade_Data';
 
-export default function TradePage({ darkMode, setDarkMode }) {
+//service
+import {User_Information, User_Infor_Modify} from '../services/user_inforamtion.jsx'
+
+
+export default function TradePage({ darkMode, setDarkMode, verify, Username }) {
     const [isLogin, setIsLogin] = useState(false);
     const [symbol, setSymbol] = useState("BINANCE:BTCUSDT");
-    
+        
     // 데이터 상태
     const [marketData, setMarketData] = useState([]); 
     const [myWatchlist, setMyWatchlist] = useState(["BTCUSDT", "ETHUSDT", "XRPUSDT", "SOLUSDT", "DOGEUSDT"]); 
@@ -40,11 +44,28 @@ export default function TradePage({ darkMode, setDarkMode }) {
         return num.toFixed(2);
     };
 
+    // 추가된 부분
+    useEffect(() => {
+        if (verify === "verified"){
+            setIsLogin(true)
+        }
+    }, [verify]);
+
+    // 추가된 부분
+    useEffect(() => {
+        const loadUser = async () => {
+          const data = await User_Information();
+          console.log("User Information:", data);
+          if (!data) return;
+        };
+
+        loadUser();
+    },[])
+    
     useEffect(() => {
         const interval = setInterval(async () => {
         const { chartData, walletData, analzeData } = await TradeData();
-
-        console.log("Received Data:", { chartData, walletData, analzeData });  
+        
         if (JSON.stringify(chartData) !== JSON.stringify(sender_chartData)) {
             setChartData(chartData);
         }
@@ -114,14 +135,15 @@ export default function TradePage({ darkMode, setDarkMode }) {
         });
     };
 
+        
     return (
         <div className="trade-container">
             <div className="area-header">
-                <Header darkMode={darkMode} setDarkMode={setDarkMode} isLogin={isLogin} />
+                <Header darkMode={darkMode} setDarkMode={setDarkMode} isLogin={isLogin} verify = {verify} Username = {Username} />
             </div>
 
             <div className="area-top-stats">
-                <TopStats isLogin={isLogin} />
+                <TopStats isLogin={isLogin} analzeData={sender_analzeData} walletData = {sender_walletData} />
             </div>
 
             <div className="area-main">
